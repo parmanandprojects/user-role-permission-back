@@ -1,7 +1,7 @@
 import { rolePermissionModel } from "../model/RolePermissionModel.js";
 
 const createRolePermission = async (req, res) => {
-  console.log(req.body.permission, 123);
+  console.log(req.body, 123);
   try {
     const result = await new rolePermissionModel({
       role_name: req.body.role_name,

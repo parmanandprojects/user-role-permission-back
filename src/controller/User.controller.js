@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  console.log(req.user, 555);
+  // console.log(req.user, 555);
 
   try {
     let data = await UserModel.find({ isDeleted: false }).populate("rolePermission");
@@ -115,21 +115,22 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  console.log(req.body);
-  console.log(req.params.id);
+  console.log(req.body,88);
+  // console.log(req.params.id,1111);
   try {
     const data = await UserModel.findByIdAndUpdate(
       { _id: req.params.id },
       { $set: { updatedAt: new Date(), ...req.body } },
       { new: true, select: "-password" }
     );
+    console.log(data,1111)
     if (data) {
-      res
+     return res
         .status(200)
         .send({ status: 200, message: "User updated successfully" });
     }
   } catch (err) {
-    res.status(500).send({ status: 500, message: "Internal server error" });
+  return  res.status(500).send({ status: 500, message: "Internal server error" });
   }
 };
 

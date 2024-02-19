@@ -30,15 +30,15 @@ userRoutes.post(
   createSlider
 );
 //Auth-
-userRoutes.post("/login-user", loginUser);
+userRoutes.post("/login-user", loginUser);//
 userRoutes.post("/forgot-password", forgotPassword);
 userRoutes.post("/reset-password", resetPassword);
 //User-
-userRoutes.post("/add-user",createUser);
+userRoutes.post("/add-user",createUser);//
 userRoutes.get("/get-user", getUser);
 // userRoutes.post("/delete-user/:id", Auth, restrict("user"), deleteUser); //permision for access  this api token dekh lega ye user admin he ya user he
 userRoutes.delete("/delete-user/:id", deleteUser); //permision for access  this api token dekh lega ye user admin he ya user he
-userRoutes.post("/update-user/:id", updateUser);
-userRoutes.get("/get-single-user/:id", getSingleUser);
+userRoutes.post("/update-user/:id",upload.single('profilePic'), updateUser);//
+userRoutes.get("/get-single-user/:id", getSingleUser);//
 
 export { userRoutes };
