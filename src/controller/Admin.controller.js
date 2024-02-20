@@ -7,12 +7,12 @@ const createRolePermission = async (req, res) => {
       role_name: req.body.role_name,
       permission: req.body.permission,
     });
-    console.log(await result, 45);
+    // console.log(await result, 45);
     await result.save();
 
-    return res.status(200).send({
-      status: 200,
-      message: "success",
+    return res.status(201).send({
+      status: 201,
+      message: "Permission access for this user successfully",
       error: result,
     });
   } catch (err) {
@@ -32,7 +32,7 @@ const getAllRolePermission = async (req, res) => {
     return res.status(200).send({
       status: 200,
       message: "Rolls fetch successfully",
-      rolls: result,
+      roles: result,
     });
   } catch (err) {
     return res
@@ -52,7 +52,7 @@ const deleteRolePermission = async (req, res) => {
     console.log(56, data);
     if (data) {
       return res.status(200).send({
-        statsu: 200,
+        status: 200,
         deleted: data,
         message: "Role deleted successfully",
       });

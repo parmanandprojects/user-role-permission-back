@@ -49,10 +49,10 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   console.log("req.body-login", req.body);
 
-  const data = await UserModel.findOne({ email });
-  console.log(data, "find-data-from db");
+  const data = await UserModel.findOne({ email }).populate("rolePermission")
+  console.log(data,89);
   if (!data) {
-    res.status(404).send({ status: 404, message: "User not found" });
+    res.status(404).send({ status: 404, message: "User not found" })
   } else {
     const campareHashResult = await hashCompare(password, data.password);
     console.log(campareHashResult);
@@ -115,12 +115,13 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  console.log(req.body,88);
+  console.log(req.file,88);
   // console.log(req.params.id,1111);
   try {
+    let profileImage = req.file.filename;
     const data = await UserModel.findByIdAndUpdate(
       { _id: req.params.id },
-      { $set: { updatedAt: new Date(), ...req.body } },
+      { $set: { updatedAt: new Date(), profilePic: profileImage, ...req.body } },
       { new: true, select: "-password" }
     );
     console.log(data,1111)
@@ -140,6 +141,7 @@ const getSingleUser = async (req, res) => {
       let data = await UserModel.findOne({ _id: req.params.id }).select(
         "-password"
       );
+      
       console.log(data, 123);
       if (data) {
         res

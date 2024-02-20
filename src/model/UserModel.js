@@ -31,7 +31,7 @@ const UserSchema = mongoose.Schema(
       require:false
     },
     rolePermission:{
-      type:mongoose.Types.ObjectId,
+      type:mongoose.Schema.Types.ObjectId,
       ref:"rolepermission"
       
     },
