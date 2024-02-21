@@ -7,19 +7,38 @@ import { ResumeProfileModel } from "../model/SliderModel.js";
 import { promises as fsPromises } from "fs";
 
 const createUser = async (req, res) => {
-  const { name, email, mobile, password,roleType } = req.body;
+  const { name, email, mobile, password, roleType } = req.body;
   console.log(req.body.roleType, 123456);
 
   try {
     console.log(req.file, 1071995);
     let profileImage = req.file.filename;
-    const findUserData = await UserModel.findOne({ email });
+    const findUserData = await UserModel.findOne({ email});
     if (findUserData) {
-      await fsPromises.unlink(req.file.path);
+      const findUserData1 = await UserModel.findOne({_id:findUserData._id, isDeleted:false});
+      if(findUserData1){
+        await fsPromises.unlink(req.file.path);
+        return res
+          .status(400)
+          .send({ status: 400, message: "User is already exist try again..." });
+      }
+     else{
+      const data = await UserModel.findByIdAndUpdate(
+        { _id: findUserData._id },
+        { $set: { isDeleted: false } },
+        { new: true, }
+      );
+     
+     if (data) {
       return res
-        .status(400)
-        .send({ status: 400, message: "User is already axist try again..." });
+        .status(201)
+        .send({ status: 201, message: "User registered successfully" });
     }
+  }
+    }
+     
+    
+
     let hashPassword = await hashGenerate(password);
     const result = await UserModel({
       name,
@@ -27,7 +46,7 @@ const createUser = async (req, res) => {
       mobile,
       profilePic: profileImage,
       password: hashPassword,
-      rolePermission:roleType
+      rolePermission: roleType,
     }).save();
     if (result) {
       res.status(201).send({
@@ -49,10 +68,10 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   console.log("req.body-login", req.body);
 
-  const data = await UserModel.findOne({ email }).populate("rolePermission")
-  console.log(data,89);
+  const data = await UserModel.findOne({ email }).populate("rolePermission");
+  console.log(data, 89);
   if (!data) {
-    res.status(404).send({ status: 404, message: "User not found" })
+    res.status(404).send({ status: 404, message: "User not found" });
   } else {
     const campareHashResult = await hashCompare(password, data.password);
     console.log(campareHashResult);
@@ -78,7 +97,9 @@ const getUser = async (req, res) => {
   // console.log(req.user, 555);
 
   try {
-    let data = await UserModel.find({ isDeleted: false }).populate("rolePermission");
+    let data = await UserModel.find({ isDeleted: false }).populate(
+      "rolePermission"
+    );
     if (data) {
       return res
         .status(200)
@@ -102,36 +123,46 @@ const deleteUser = async (req, res) => {
         { $set: { isDeleted: true, deletedAt: new Date() } },
         { new: true, select: "-password" }
       );
-      console.log(data,123456)
+      console.log(data, 123456);
       if (data) {
-      return  res.status(200).send({ status: 200, message: "Deleted successfully" });
+        return res
+          .status(200)
+          .send({ status: 200, message: "Deleted successfully" });
       }
     } else {
-     return res.status(401).send({ status: 401, message: "Please provide id" });
+      return res
+        .status(401)
+        .send({ status: 401, message: "Please provide id" });
     }
   } catch (err) {
-  return  res.status(500).send({ status: 500, message: "Internal server error" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Internal server error" });
   }
 };
 
 const updateUser = async (req, res) => {
-  console.log(req.file,88);
+  console.log(req.file, 88);
   // console.log(req.params.id,1111);
   try {
     let profileImage = req.file.filename;
     const data = await UserModel.findByIdAndUpdate(
       { _id: req.params.id },
-      { $set: { updatedAt: new Date(), profilePic: profileImage, ...req.body } },
+      {
+        $set: { updatedAt: new Date(), profilePic: profileImage, ...req.body },
+      },
       { new: true, select: "-password" }
     );
-    console.log(data,1111)
+    console.log(data, 1111);
     if (data) {
-     return res
+      return res
         .status(200)
         .send({ status: 200, message: "User updated successfully" });
     }
   } catch (err) {
-  return  res.status(500).send({ status: 500, message: "Internal server error" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Internal server error" });
   }
 };
 
@@ -141,12 +172,12 @@ const getSingleUser = async (req, res) => {
       let data = await UserModel.findOne({ _id: req.params.id }).select(
         "-password"
       );
-      
+
       console.log(data, 123);
       if (data) {
         res
           .status(200)
-          .send({user:data, satus: 200, message: "Fetch user successfully" });
+          .send({ user: data, satus: 200, message: "Fetch user successfully" });
       } else {
         res.status(404).send({ satus: 404, message: "User not found" });
       }
@@ -242,12 +273,10 @@ const createSlider = async (req, res) => {
       //   await fsPromises.unlink(sliderImagePath);
       // }
 
-      return res
-        .status(404)
-        .send({
-          status: 404,
-          message: "User already exists !!",
-        });
+      return res.status(404).send({
+        status: 404,
+        message: "User already exists !!",
+      });
     }
 
     let user = await ResumeProfileModel({
@@ -255,7 +284,7 @@ const createSlider = async (req, res) => {
       email,
       userImage,
       resumeUpload,
-      slideImage:sliderImagePaths
+      slideImage: sliderImagePaths,
     }).save();
     if (user) {
       return res.status(201).send({
@@ -264,13 +293,11 @@ const createSlider = async (req, res) => {
       });
     }
   } catch (err) {
-    return res
-      .status(500)
-      .send({
-        status: 500,
-        message: "Internal server error",
-        error: err.message,
-      });
+    return res.status(500).send({
+      status: 500,
+      message: "Internal server error",
+      error: err.message,
+    });
   }
 };
 
