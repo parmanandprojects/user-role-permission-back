@@ -2,15 +2,16 @@
   "name": "role-access",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "build": "run-node",
+   
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
+  "private": false,
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -21,5 +22,8 @@
     "mongoose": "^8.1.1",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }
